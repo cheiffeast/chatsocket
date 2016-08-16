@@ -1,6 +1,7 @@
 from socketserver import ThreadingTCPServer, BaseRequestHandler
 from threading import Thread
-import pickle,datetime,os
+import pickle,datetime,os,chatMisc
+
 
 
 messages = []
@@ -47,7 +48,7 @@ class Echo(BaseRequestHandler):
                                        msg.decode())
             
             messages.append(msg)
-            print("Message sent:"+msg)
+            print("Message received from {}: {}".format(self.username,msg))
 
             
             #This checks if the user wishes to quit from the server
@@ -66,8 +67,13 @@ class Echo(BaseRequestHandler):
             
             #Checks if the two lists are different lengths
             if len(self.temp) != len(messages):
+
+
                 
-                data_string = pickle.dumps(messages)
+                messages2Send = [msg
+                                 for msg in messages
+                                 if msg not in self.temp]
+                data_string = pickle.dumps(messages2Send)
                 self.request.send(data_string)
                 
                 #This makes the self.temp contain the same items as messages

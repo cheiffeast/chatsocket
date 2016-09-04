@@ -1,19 +1,22 @@
 from socketserver import ThreadingTCPServer, BaseRequestHandler
 from threading import Thread
+from time import sleep, strftime
 import pickle,datetime,os
 
 
 
 messages = []
+nusers = 0
 os.system("cls")
-class Echo(BaseRequestHandler):
+class messageServer(BaseRequestHandler):
     
         
     def handle(self):
+        global nusers, messages
         #Defining some variables
         #self.temp is a list that will hold the last messages, see send
         self.temp = []
-
+        nusers += 1
         #self.running is used to terminate the Thread that has send running
         self.running = True
 
@@ -28,9 +31,10 @@ class Echo(BaseRequestHandler):
 
         #Prints out to the server, where the connection has come from
         #Also prints the alias of the connected user
-        print("Got connection from {}:{}".format(self.client_address[0],
-                                                 self.client_address[1]))
-        print("Username: {}".format(self.username))
+        print("Got connection from {}:{}, using username: {}".format(self.client_address[0],
+                                                                     self.client_address[1],
+                                                                     self.username))
+        
 
         #This is the main loop for receiveing messages from the client
         while True:
@@ -38,12 +42,12 @@ class Echo(BaseRequestHandler):
                 
                 msg = self.request.recv(8192)
             except:
-                
+                nusers -= 1
                 print(self.username+" disconnected from the server")
                 break
 
             #Formatting the message
-            msg = "[{} | {}]: {}".format(datetime.datetime.now().strftime("%H:%M:%S"),
+            msg = "[{}] {}: {}".format(strftime("%H:%m:%S"),
                                        self.username,
                                        msg.decode())
             
@@ -53,8 +57,9 @@ class Echo(BaseRequestHandler):
             
             #This checks if the user wishes to quit from the server
             if msg == "quit":
+                nusers -= 1
                 break
-
+            log_messages()
         self.running = False
     def send(self):
         
@@ -80,8 +85,31 @@ class Echo(BaseRequestHandler):
                 #Doing self.temp = messages, seems to refernece messages
                 #So whenever messages is updated so is self.temp
                 self.temp = [item for item in messages]
+            sleep(0.1)
 
-                
+def print_users():
+    while True:
+        print(("[{}] There are currently "+str(nusers)+
+               " users connected to this server").format(strftime("%H:%m:%S")))
+
+        sleep(20)
+
+
+
+
+def log_messages():
+    
+    with open("previousMsg.txt", "w") as f:
+        data_string = "\n".join(messages)
+        f.write(data_string)
+        
+
+        
 if __name__ == "__main__":
-    serv = ThreadingTCPServer(("",20000), Echo)
-    serv.serve_forever()
+    try:
+        Thread(target = print_users).start()
+        serv = ThreadingTCPServer(("",20000), messageServer)
+        serv.serve_forever()
+    except:
+        print("A server is already running, 2 servers can not be ran on the same port")
+    sleep(2)

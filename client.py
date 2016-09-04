@@ -33,7 +33,12 @@ def receive():
             print(item)
 
         #winsound.Beep when a new message is received
-        Beep(500,250)
+        usernameSent = messages[-1].split(":")
+        usernameSent = usernameSent[2].split("]")[1].replace(" ", "")
+        
+        
+        if username != usernameSent:
+            Beep(500,250)
 #Asking the user for their username
 username = input("Enter your username: ")
 
@@ -47,7 +52,7 @@ time.sleep(0.1)
 while True:
 
     #Ask the user for a message
-    msg = input(">>")
+    msg = input("")
     
     if msg == "quit":
         break

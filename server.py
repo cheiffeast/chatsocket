@@ -1,13 +1,13 @@
 from socketserver import ThreadingTCPServer, BaseRequestHandler
 from threading import Thread
 from time import sleep, strftime
-import pickle,datetime,os
+import pickle
 
 
 
 messages = []
 nusers = 0
-os.system("cls")
+
 class messageServer(BaseRequestHandler):
     
         
@@ -39,7 +39,6 @@ class messageServer(BaseRequestHandler):
         #This is the main loop for receiveing messages from the client
         while True:
             try:
-                
                 msg = self.request.recv(8192)
             except:
                 nusers -= 1
@@ -47,17 +46,16 @@ class messageServer(BaseRequestHandler):
                 break
 
             #Formatting the message
-            msg = "[{}] {}: {}".format(strftime("%H:%m:%S"),
+            formattedmsg = "[{}] {}: {}".format(strftime("%H:%m:%S"),
                                        self.username,
                                        msg.decode())
             
-            messages.append(msg)
-            print("Message received from {}: {}".format(self.username,msg))
-
+            messages.append(formattedmsg)
             
             #This checks if the user wishes to quit from the server
-            if msg == "quit":
+            if msg.decode() == "quit":
                 nusers -= 1
+                print(self.username+" disconnected from the server")
                 break
             log_messages()
         self.running = False
@@ -89,10 +87,10 @@ class messageServer(BaseRequestHandler):
 
 def print_users():
     while True:
-        print(("[{}] There are currently "+str(nusers)+
-               " users connected to this server").format(strftime("%H:%m:%S")))
+        print(("[{}] There are currently {} users connected to this server")
+              .format(strftime("%H:%m:%S"), nusers))
 
-        sleep(20)
+        sleep(60)
 
 
 
@@ -103,7 +101,8 @@ def log_messages():
         data_string = "\n".join(messages)
         f.write(data_string)
         
-
+def load_config():
+    print("nothing")
         
 if __name__ == "__main__":
     try:
@@ -112,4 +111,4 @@ if __name__ == "__main__":
         serv.serve_forever()
     except:
         print("A server is already running, 2 servers can not be ran on the same port")
-    sleep(2)
+        sleep(2)

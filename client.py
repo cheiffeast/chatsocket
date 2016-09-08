@@ -13,16 +13,22 @@ s = socket.socket()
 s.connect(('localhost',20000))
 messages = []
 
+
 #Main function to fetch data from the server
 def receive():
-
-    while True:
+    running = True
+    while running:
 
         #Wait to receive data from the server
-        data = s.recv(8192)
-
+        try:
+            data = s.recv(8192)
+        except Exception as e:
+            print("Disconnected from host")
+            running = False
+            
         #Deserialize the data from the server 
         data = pickle.loads(data)
+         
         os.system("cls")
 
         #Print out all the items in data
@@ -35,7 +41,7 @@ def receive():
         #winsound.Beep when a new message is received
         usernameSent = messages[-1].split(":")
         usernameSent = usernameSent[2].split("]")[1].replace(" ", "")
-        
+         
         
         if username != usernameSent:
             Beep(500,250)
@@ -52,7 +58,9 @@ time.sleep(0.1)
 while True:
 
     #Ask the user for a message
-    msg = input("")
+    
+    
+    msg = input(">> ")
     
     if msg == "quit":
         break

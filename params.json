@@ -1,0 +1,6 @@
+{
+  "name": "Chatsocket",
+  "tagline": "A live chat using sockets in python",
+  "body": "# Chat Socket\r\nThis is a simple project where i use python socketserver and socket libraries to create a live chat room\r\n\r\n# How to use\r\nSimple run server.py first, then the clients\r\n\r\n# New things to be added\r\nAllowing the user to fill in a config file for password and if encryption should be turned on. Also the server owner should be able to create his/her own commands which will echo data back to the client\r\n",
+  "note": "Don't delete this file! It's used internally to help with page regeneration."
+}
